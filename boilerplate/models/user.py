@@ -1,13 +1,11 @@
 # coding=utf-8
 import datetime
-import enum
+
 import logging
 
 from sqlalchemy import ForeignKey
 from flask_restplus import fields
 from boilerplate.models import db, bcrypt, TimestampMixin
-from sqlalchemy.orm import relationship
-
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -26,7 +24,6 @@ class User(db.Model, TimestampMixin):
         """
         for k, v in kwargs.items():
             setattr(self, k, v)
-
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(191), nullable=False, unique=True)
@@ -48,6 +45,9 @@ class User(db.Model, TimestampMixin):
     def password(self, password):
         self.password_hash = bcrypt.generate_password_hash(
             password).decode('utf-8')
+
+    def get_password(self):
+        return self.password_hash
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)

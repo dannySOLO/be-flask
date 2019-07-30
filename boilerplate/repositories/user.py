@@ -1,8 +1,12 @@
 # coding=utf-8
 import logging
+# import random
+
+import datetime
 
 from sqlalchemy import or_
 from boilerplate import models as m
+# from boilerplate.models import bcrypt
 
 __author__ = 'Kien'
 _logger = logging.getLogger(__name__)
@@ -67,7 +71,6 @@ def find_one_by_email_ignore_case(email):
 def find_one_by_email_in_signup_request(email):
     """
     Return a user_signup_request instance if match, else None
-    :param str username:
     :return: a user instance
     :rtype: m.User
     """
@@ -90,9 +93,8 @@ def delete_one_by_email_in_signup_request(email):
     m.db.session.delete(user_signup_request)
     m.db.session.commit()
 
-# def save_history_pass_change_to_database(user_id, history_pass_change):
 
-
+# ====================
 def save_user_token_to_database(**kwargs):
     user_token = m.UserToken(**kwargs)
     m.db.session.add(user_token)
@@ -100,9 +102,35 @@ def save_user_token_to_database(**kwargs):
     return user_token
 
 
-def save_history_password_to_database(**kwargs):
-    password = m.HistoryPassChange(**kwargs)
-    m.db.session.add(password)
+def update_last_login_to_database(email, **kwargs):
+    user = m.User.query.filter_by(email=email).first()
+    user.last_login = datetime.datetime.now()
     m.db.session.commit()
-    return password
+    return user
+
+
+# Do 2 bullshit steps after password's changed
+def save_history_password_to_database(**kwargs):
+    password_rec = m.HistoryPassChange(**kwargs)
+    m.db.session.add(password_rec)
+    m.db.session.commit()
+    return password_rec
+
+
+def update_password_to_database(email, new_password, **kwargs):
+
+    user = m.User.query.filter_by(email=email).first()
+    user.password = new_password
+    m.db.session.commit()
+    return user
+
+
+def create_random_hash_password():
+    return 'This function has not been used yet'
+
+
+# after logging out, set expired_time to timestamp now
+# def update_expired_time_of_token(**kwargs):
+#     user_logout = m.UserToken.query.filter_by(user_id=m.User.id).firs()
+#     m.db.session.
 

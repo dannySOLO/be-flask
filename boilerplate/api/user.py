@@ -7,6 +7,7 @@ from boilerplate import services, models
 from boilerplate.extensions import Namespace
 from itsdangerous import SignatureExpired
 from boilerplate.services.user import serializer
+import flask_jwt_extended as _jwt
 
 __author__ = 'ThucNC'
 _logger = logging.getLogger(__name__)
@@ -59,15 +60,54 @@ class Login(_fr.Resource):
             return jsonify({"token": token_login})
 
 # ==================
+# Not work
+@ns.route('/change_password', methods=['POST'])
+class ChangePassword(_fr.Resource):
+    # @ns.expect(username, old_password, new_password, confirm_password)
+    @_jwt.jwt_required
+    def post(self):
+        data = request.json or request.args
+        try:
+            update = services.user.change_password(**data)
+        except Exception as e:
+            raise e
+        else:
+            return jsonify({"Password changed": update})
 
 
-# @ns.route('/logout', methods=['GET'])
-# class Logout(_fr.Resource):
-#     def get(self):
-#         return jsonify({"Successful": "logout"})
+@ns.route('/confirm_email_password/', methods=['GET'])
+class ConfirmEmailPassword(_fr.Resource):
+    def get(self):
+        token = request.values
+        try:
+            email = serializer.loads(token.get('token'),
+                                     salt='my_precious_security_password_salt', max_age=300)  # 5'
+        except SignatureExpired:
+            return 'The link is expired!'
+        else:
+            # have to update code
+
+            return 'Successful, please login!'
 
 
-# @ns.route('/change_password', methods=['POST'])
-# class ChangePassword(_fr.Resource):
+# @ns.route('/forget_password', method=['POST'])
+# class ForgetPassword(_fr.resource):
 #     def post(self):
+#         data = request.json or request.args
+#         try:
+#
+#         except Exception as e:
+#             raise e
+#         else
+#             return jsonify({'' : })
+
+
+
+
+
+@ns.route('/logout', methods=['GET'])
+class Logout(_fr.Resource):
+    def get(self):
+        # code
+        return jsonify({"Successful": "logout"})
 
