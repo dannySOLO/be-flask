@@ -59,24 +59,25 @@ class Login(_fr.Resource):
         else:
             return jsonify({"token": token_login})
 
+
 # ==================
-# Not work
 @ns.route('/change_password', methods=['POST'])
 class ChangePassword(_fr.Resource):
     # @ns.expect(username, old_password, new_password, confirm_password)
     @_jwt.jwt_required
     def post(self):
         data = request.json or request.args
+        email = _jwt.get_jwt_identity().get('email')
         try:
-            update = services.user.change_password(**data)
+            update = services.user.change_password(email=email, **data)
         except Exception as e:
             raise e
         else:
             return jsonify({"Password changed": update})
 
 
-@ns.route('/confirm_email_password/', methods=['GET'])
-class ConfirmEmailPassword(_fr.Resource):
+@ns.route('/confirm_email_forget_password/', methods=['GET'])
+class ConfirmEmailForgetPassword(_fr.Resource):
     def get(self):
         token = request.values
         try:
@@ -86,28 +87,25 @@ class ConfirmEmailPassword(_fr.Resource):
             return 'The link is expired!'
         else:
             # have to update code
-
+            services.user.change_password_after_confirm_forgetting_to_database(email)
             return 'Successful, please login!'
 
 
-# @ns.route('/forget_password', method=['POST'])
-# class ForgetPassword(_fr.resource):
-#     def post(self):
-#         data = request.json or request.args
-#         try:
-#
-#         except Exception as e:
-#             raise e
-#         else
-#             return jsonify({'' : })
+@ns.route('/forget_password', methods=['POST'])
+class ForgetPassword(_fr.Resource):
+    def post(self):
+        data = request.json or request.args
+        try:
+            url = services.user.forget_password(**data)
+        except Exception as e:
+            raise e
+        else:
+            return jsonify({'Check email for the link of changing password': url})
 
 
-
-
-
-@ns.route('/logout', methods=['GET'])
-class Logout(_fr.Resource):
-    def get(self):
-        # code
-        return jsonify({"Successful": "logout"})
+# @ns.route('/logout', methods=['GET'])
+# class Logout(_fr.Resource):
+#     def get(self):
+#         # code
+#         return jsonify({"Successful": "logout"})
 

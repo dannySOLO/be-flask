@@ -125,10 +125,6 @@ def update_password_to_database(email, new_password, **kwargs):
     return user
 
 
-def create_random_hash_password():
-    return 'This function has not been used yet'
-
-
 # after logging out, set expired_time to timestamp now
 # def update_expired_time_of_token(**kwargs):
 #     user_logout = m.UserToken.query.filter_by(user_id=m.User.id).firs()

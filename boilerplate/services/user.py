@@ -2,8 +2,9 @@
 import logging
 import re
 import datetime
-import random
 
+import random
+import string
 
 from boilerplate import models as m
 from boilerplate import repositories, models
@@ -22,6 +23,12 @@ validate_email = r"[^@]+@[^\.]+\..+"
 validate_password = r"^[A-Za-z0-9]{6,}$"
 # regex for advance: "r'[A-Za-z0-9@#$%^&+=]{8,}"
 host_users = 'http://127.0.0.1:5000/api/users'
+
+
+def random_string(string_length=6):
+    """Generate a random string of fixed length """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(string_length))
 
 
 def create_user(email, **kwargs):
@@ -74,7 +81,7 @@ def register(username, email, password, re_pass, **kwargs):
                 )
             )
 
-        email_confirm_token = serializer.dumps(email, salt='my_precious_security_password_salt')
+        email_confirm_token = serializer.dumps(email, salt='more_salt_please')
         message = Message('Confirm email', sender='ducanh.danny@gmail.com', recipients=[email])
         link = host_users+'/confirm_email/?token={}'.format(email_confirm_token)
 
@@ -109,16 +116,20 @@ def login(username, password):
         password and re.match(validate_password, password)
     ):
         find_user = repositories.user.find_one_by_username_ignore_case(username=username)
+        expired_time_min = datetime.timedelta(minutes=30)
         if not find_user:
             raise BadRequestException("Username does not exist.")
         if models.User.check_password(find_user, password):
             token = create_access_token(identity={
-                "id": find_user.id,
-                'time': datetime.datetime.now() + datetime.timedelta(minutes=30),
-            })
+                "username": find_user.username,
+                "email": find_user.email,
+                "is_admin": find_user.is_admin
+            }, expires_delta=expired_time_min)
+
             repositories.user.save_user_token_to_database(
-                user_id=find_user.id, token=token,
-                expired_time=(datetime.datetime.now() + datetime.timedelta(minutes=30))
+                user_id=find_user.id,
+                token=token,
+                expired_time=datetime.datetime.now() + expired_time_min
             )
 
             repositories.user.update_last_login_to_database(email=find_user.email)
@@ -130,7 +141,6 @@ def login(username, password):
         raise BadRequestException("Invalid username or password")
 
 # ========================
-# Not work
 
 
 def change_password(email, old_password, new_password, confirm_password, **kwargs):
@@ -157,7 +167,7 @@ def change_password(email, old_password, new_password, confirm_password, **kwarg
         updated_user = repositories.user.update_password_to_database(email=email, new_password=new_password)
     else:
         raise BadRequestException("Invalid data specified")
-    return "updated password"
+    return "Password is updated!"
 
 
 def forget_password(username, email, **kwargs):
@@ -172,19 +182,33 @@ def forget_password(username, email, **kwargs):
                     email=email
                 )
             )
+        elif (
+            existed_user != repositories.user.find_one_by_username_ignore_case(username)
+        ):
+            raise BadRequestException(
+                "User with username and email not match!"
+            )
+        else:
+            email_confirm_token = serializer.dumps(email, salt='more_salt_please')
+            message = Message('Confirm email change password', sender='ducanh.danny@gmail.com', recipients=[email])
+            link = host_users+'/confirm_email_forget_password/?token={}'.format(email_confirm_token)
 
-        email_confirm_token = serializer.dumps(email, salt='my_precious_security_password_salt')
-        message = Message('Confirm email change password', sender='ducanh.danny@gmail.com', recipients=[email])
-        link = host_users+'/confirm_email_password/?token={}'.format(email_confirm_token)
+            message.body = 'Link to confirm password change: {}'.format(link)
+            # mail.send(message)
 
-        message.body = 'Link to confirm password change: {}'.format(link)
-        # mail.send(message)
+        return link
+    else:
+        raise BadRequestException(
+            "Invalid data specified!"
+        )
 
-        # repositories.user.update_password_to_database(
-        #
-        #     password=repositories.user.create_random_hash_password()
-        # )
 
+def change_password_after_confirm_forgetting_to_database(email):
+    random_password = random_string(6)
+    repositories.user.update_password_to_database(
+        password=repositories.user.update_password_to_database(email=email, new_password=random_password)
+    )
+    return random_password
 
 # def logout(user_id):
 #     repositories.user.save_user_token_to_database(
