@@ -203,10 +203,10 @@ def forget_password(username, email, **kwargs):
         )
 
 
-def change_password_after_confirm_forgetting_to_database(email):
+def change_password_after_confirm_forgetting_to_database(email, **kwargs):
     random_password = random_string(6)
     repositories.user.update_password_to_database(
-        password=repositories.user.update_password_to_database(email=email, new_password=random_password)
+        email=email, new_password=random_password
     )
     return random_password
 

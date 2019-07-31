@@ -39,7 +39,7 @@ class ConfirmEmail(_fr.Resource):
         token = request.values
         try:
             email = serializer.loads(token.get('token'),
-                                     salt='my_precious_security_password_salt', max_age=300)  # 5'
+                                     salt='more_salt_please', max_age=300)  # 5'
         except SignatureExpired:
             return 'The link is expired!'
         else:
@@ -82,17 +82,18 @@ class ConfirmEmailForgetPassword(_fr.Resource):
         token = request.values
         try:
             email = serializer.loads(token.get('token'),
-                                     salt='my_precious_security_password_salt', max_age=300)  # 5'
+                                     salt='more_salt_please', max_age=300)  # 5'
         except SignatureExpired:
             return 'The link is expired!'
         else:
             # have to update code
-            services.user.change_password_after_confirm_forgetting_to_database(email)
-            return 'Successful, please login!'
+            new_random_password = services.user.change_password_after_confirm_forgetting_to_database(email)
+            return jsonify({'Successful, your new pass is now' : new_random_password})
 
 
 @ns.route('/forget_password', methods=['POST'])
 class ForgetPassword(_fr.Resource):
+    @ns.expect()
     def post(self):
         data = request.json or request.args
         try:
