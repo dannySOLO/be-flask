@@ -55,13 +55,13 @@ def create_user(email, **kwargs):
     return user
 
 
-def register(username, email, password, re_pass, **kwargs):
+def register(username, email, password, confirm_password, **kwargs):
     """
     validate post data, save user in table signup_request and send email confirmation
     :param username:
     :param email:
     :param password:
-    :param re_pass:
+    :param confirm_password:
     :param kwargs:
     :return:
     """
@@ -70,8 +70,8 @@ def register(username, email, password, re_pass, **kwargs):
         username and len(username) < 50 and
         email and re.match(validate_email, email) and
         password and re.match(validate_password, password) and
-        re_pass and re.match(validate_password, re_pass) and
-        password == re_pass
+        confirm_password and re.match(validate_password, confirm_password) and
+        password == confirm_password
     ):
         existed_user = repositories.user.find_one_by_email_ignore_case(email)
         if existed_user:

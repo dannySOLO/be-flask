@@ -126,7 +126,7 @@ def update_password_to_database(email, new_password, **kwargs):
 
 
 # after logging out, set expired_time to timestamp now
-# def update_expired_time_of_token(**kwargs):
-#     user_logout = m.UserToken.query.filter_by(user_id=m.User.id).firs()
+# def update_expired_time_of_token(user_id, token, **kwargs):
+#     user_logout = m.UserToken.query.filter_by(user_id=m.User.id).first()
 #     m.db.session.
 

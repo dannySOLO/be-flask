@@ -30,7 +30,7 @@ class Register(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({"Successful": url})
+            return jsonify({"verification_link": url})
 
 
 @ns.route('/confirm_email/', methods=['GET'])
@@ -63,7 +63,7 @@ class Login(_fr.Resource):
 # ==================
 @ns.route('/change_password', methods=['POST'])
 class ChangePassword(_fr.Resource):
-    # @ns.expect(username, old_password, new_password, confirm_password)
+    # @ns.expect(email, old_password, new_password, confirm_password)
     @_jwt.jwt_required
     def post(self):
         data = request.json or request.args
@@ -88,7 +88,7 @@ class ConfirmEmailForgetPassword(_fr.Resource):
         else:
             # have to update code
             new_random_password = services.user.change_password_after_confirm_forgetting_to_database(email)
-            return jsonify({'Successful, your new pass is now' : new_random_password})
+            return jsonify({'new_password': new_random_password})
 
 
 @ns.route('/forget_password', methods=['POST'])
@@ -101,12 +101,12 @@ class ForgetPassword(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({'Check email for the link of changing password': url})
+            return jsonify({'verification_link': url})
 
 
 # @ns.route('/logout', methods=['GET'])
 # class Logout(_fr.Resource):
 #     def get(self):
 #         # code
-#         return jsonify({"Successful": "logout"})
+#         return jsonify({"status": "logout"})
 

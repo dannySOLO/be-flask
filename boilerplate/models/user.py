@@ -86,7 +86,7 @@ class UserSchema:
         'password': fields.String(required=True, description='user password'),
     })
     user_create_req.update({
-        're_pass': fields.String(required=True, description='user rewrite password'),
+        'confirm_password': fields.String(required=True, description='user rewrite password'),
     })
 
     user_login_req = user.copy()
