@@ -73,7 +73,7 @@ class ChangePassword(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({"Password changed": update})
+            return jsonify({"password_changed": update})
 
 
 @ns.route('/confirm_email_forget_password/', methods=['GET'])
@@ -104,9 +104,9 @@ class ForgetPassword(_fr.Resource):
             return jsonify({'verification_link': url})
 
 
-# @ns.route('/logout', methods=['GET'])
-# class Logout(_fr.Resource):
-#     def get(self):
-#         # code
-#         return jsonify({"status": "logout"})
+@ns.route('/logout', methods=['GET'])
+class Logout(_fr.Resource):
+    def get(self):
+        # code
+        return jsonify({"status": "logout"})
 
