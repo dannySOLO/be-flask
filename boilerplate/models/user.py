@@ -7,7 +7,7 @@ from sqlalchemy import ForeignKey
 from flask_restplus import fields
 from boilerplate.models import db, bcrypt, TimestampMixin
 
-__author__ = 'ThucNC'
+__author__ = 'ThucNC' + ''
 _logger = logging.getLogger(__name__)
 
 

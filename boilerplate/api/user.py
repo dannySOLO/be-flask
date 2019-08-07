@@ -9,7 +9,7 @@ from itsdangerous import SignatureExpired
 from boilerplate.services.user import serializer
 import flask_jwt_extended as _jwt
 
-__author__ = 'ThucNC'
+__author__ = 'ThucNC' + ''
 _logger = logging.getLogger(__name__)
 
 ns = Namespace('users', description='User operations')
@@ -30,7 +30,7 @@ class Register(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({"verification_link": url})
+            return jsonify({"successful": "Check your email for registration"})
 
 
 @ns.route('/confirm_email/', methods=['GET'])
@@ -44,7 +44,7 @@ class ConfirmEmail(_fr.Resource):
             return 'The link is expired!'
         else:
             services.user.create_user(email)
-            return 'Successful, please login!'
+            return "Register successfully!"
 
 
 @ns.route('/login', methods=['POST'])
@@ -57,7 +57,8 @@ class Login(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({"token": token_login})
+            return jsonify({'token': token_login,
+                            'success': 'Login successfully!'})
 
 
 # ==================
@@ -73,7 +74,7 @@ class ChangePassword(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({"password_changed": update})
+            return jsonify({"successful": "Password changed"})
 
 
 @ns.route('/confirm_email_forget_password/', methods=['GET'])
@@ -88,7 +89,7 @@ class ConfirmEmailForgetPassword(_fr.Resource):
         else:
             # have to update code
             new_random_password = services.user.change_password_after_confirm_forgetting_to_database(email)
-            return jsonify({'new_password': new_random_password})
+            return 'Your new password: ' + new_random_password
 
 
 @ns.route('/forget_password', methods=['POST'])
@@ -101,7 +102,7 @@ class ForgetPassword(_fr.Resource):
         except Exception as e:
             raise e
         else:
-            return jsonify({'verification_link': url})
+            return jsonify({'successful': 'Check your email for password verification'})
 
 
 @ns.route('/logout', methods=['GET'])

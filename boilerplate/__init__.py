@@ -11,7 +11,7 @@ from boilerplate.extensions.exceptions import NotFoundException, \
 from boilerplate.extensions.sentry import before_send
 from flask_cors import CORS
 
-__author__ = 'ThucNC'
+__author__ = 'ThucNC' + ''
 _logger = logging.getLogger(__name__)
 
 SENTRY_DSN = 'SENTRY_DSN'
@@ -72,6 +72,6 @@ def create_app():
 
 app = create_app()
 jwt = JWTManager(app)
-mail = Mail(app)
 cors = CORS(app)
+mail = Mail(app)
 

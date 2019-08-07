@@ -8,14 +8,15 @@ import string
 
 from boilerplate import models as m
 from boilerplate import repositories, models
+
+
 from flask_jwt_extended import create_access_token
 from boilerplate.extensions.exceptions import BadRequestException
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
-# from boilerplate import mail
 # from flask import url_for
 
-__author__ = 'Kien'
+__author__ = 'Kien' + ''
 _logger = logging.getLogger(__name__)
 
 serializer = URLSafeTimedSerializer('my_precious_secret_key')
@@ -56,6 +57,7 @@ def create_user(email, **kwargs):
 
 
 def register(username, email, password, confirm_password, **kwargs):
+    from boilerplate import mail
     """
     validate post data, save user in table signup_request and send email confirmation
     :param username:
@@ -82,11 +84,11 @@ def register(username, email, password, confirm_password, **kwargs):
             )
 
         email_confirm_token = serializer.dumps(email, salt='more_salt_please')
-        message = Message('Confirm email', sender='ducanh.danny@gmail.com', recipients=[email])
+        message = Message('PROJECT - Confirm email for registration', sender='ducanh.danny@gmail.com', recipients=[email])
         link = host_users+'/confirm_email/?token={}'.format(email_confirm_token)
 
-        message.body = 'Registration confirm link: {}'.format(link)
-        # mail.send(message)
+        message.body = 'Click the link below to confirm registration in PROJECT: {}'.format(link)
+        mail.send(message)
 
         # [WinError 10061] No connection could be made because the target machine actively refused it
         # Confirm register email manually instead
@@ -171,6 +173,8 @@ def change_password(email, old_password, new_password, confirm_password, **kwarg
 
 
 def forget_password(username, email, **kwargs):
+    from boilerplate import mail
+
     if (
             username and len(username) < 50 and
             email and re.match(validate_email, email)
@@ -190,11 +194,11 @@ def forget_password(username, email, **kwargs):
             )
         else:
             email_confirm_token = serializer.dumps(email, salt='more_salt_please')
-            message = Message('Confirm email change password', sender='ducanh.danny@gmail.com', recipients=[email])
+            message = Message('PROJECT - Confirm email for changing password', sender='ducanh.danny@gmail.com', recipients=[email])
             link = host_users+'/confirm_email_forget_password/?token={}'.format(email_confirm_token)
 
-            message.body = 'Link to confirm password change: {}'.format(link)
-            # mail.send(message)
+            message.body = 'Click the link below to confirm changing password: {}'.format(link)
+            mail.send(message)
 
         return link
     else:

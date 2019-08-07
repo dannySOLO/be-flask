@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 _DOT_ENV_PATH = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(_DOT_ENV_PATH)
 
-__author__ = 'Kien'
+__author__ = 'Kien' + ''
 _logger = logging.getLogger(__name__)
 
 ROOT_DIR = os.path.abspath(os.path.join(
@@ -35,6 +35,13 @@ SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}'.format(
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+
+MAIL_SERVER = os.getenv('MAIL_SERVER')
+MAIL_PORT = os.getenv('MAIL_PORT')
+MAIL_USE_SSL = os.getenv('MAIL_USE_SSL')
+MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
 
 
 def _env(name, default):

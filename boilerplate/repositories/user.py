@@ -8,7 +8,7 @@ from sqlalchemy import or_
 from boilerplate import models as m
 # from boilerplate.models import bcrypt
 
-__author__ = 'Kien'
+__author__ = 'Kien' + ''
 _logger = logging.getLogger(__name__)
 
 
