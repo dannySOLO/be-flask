@@ -2,67 +2,61 @@
 import json
 import logging
 
-from boilerplate import models as m
+from boilerplate import models as m, repositories
 from boilerplate.tests.api import APITestCase
 
-__author__ = 'Kien'
+__author__ = 'Kien' + ''
 _logger = logging.getLogger(__name__)
 
+# existed_user = repositories.user.save_user_to_database(
+#     email='existed@gmail.com',
+#     username='existed',
+#     password='existed'
+# )
 
-class UserApiTestCase(APITestCase):
+
+# 恋人心 我爱你 你好 一百万个可能 阮地英 不仅仅是喜欢 我爱你
+class RegisterApiTestCase(APITestCase):
     def url(self):
-        return '/api/users/'
+        return '/api/users/register'
 
     def method(self):
         return 'POST'
 
-    def test_create_user_when_success_then_insert_user_into_db(self):
-        uid = 1
-        valid_data = {
-            'id': uid,
-            'username': 'admin',
-            'email': 'admin@example.com',
-            'password': 'secret',
-            'role': 'admin'
+    def test_raise_error_when_email_is_existed(self):
+        email = 'existed@gmail.com'
+        data = {
+            'email': email,
+            'username': 'username',
+            'password': 'password',
+            'confirm_password': 'password'
         }
 
-        self.send_request(data=valid_data)
-        saved_user = m.User.query.get(uid)  # type: m.User
+        self.send_request(data=data)
+        saved_user = m.SignupRequest.query.get(data['username'])   # type: m.SignupRequest
+        assert saved_user, "No sign up request saved to database."
 
-        assert saved_user
-        self.assertEqual(saved_user.id, uid)
-        self.assertEqual(saved_user.username, valid_data['username'])
-        self.assertEqual(saved_user.email, valid_data['email'])
-        self.assertEqual(saved_user.role, valid_data['role'])
+    # def test_save_to_signup_request_when_data_is_valid(self):
+    #     email = 'emailx@gmail.com'
+    #     valid_data = {
+    #         'email': email,
+    #         'username': 'usernamex',
+    #         'password': 'passwordx',
+    #         'confirm_password': 'passwordx'
+    #     }
+    #
+    #     self.send_request(data=valid_data)
+    #     saved_user = m.SignupRequest.query.get(email)    # type: m.SignupRequest
+    #     assert saved_user, "Valid"
+    #     self.assertEqual(saved_user.email, valid_data['email'])
+    #     self.assertEqual(saved_user.username, valid_data['username'])
 
-    def test_create_user_when_success_then_return_user_response(self):
-        uid = 1
-        valid_data = {
-            'id': uid,
-            'username': 'admin',
-            'email': 'admin@example.com',
-            'password': 'secret',
-            'role': 'admin'
-        }
 
-        rv = self.send_request(data=valid_data)
+class LoginApiTestCase(APITestCase):
+    def url(self):
+        return '/api/users/login'
 
-        self.assertEqual(200, rv.status_code)
-        res_data = json.loads(rv.data)['data']
-        self.assertEqual(res_data['id'], valid_data['id'])
-        self.assertEqual(res_data['username'], valid_data['username'])
-        self.assertEqual(res_data['username'], valid_data['username'])
-        self.assertEqual(res_data['email'], valid_data['email'])
-        self.assertEqual(res_data['role'], valid_data['role'])
+    def method(self):
+        return 'POST'
 
-    def test_create_user_when_invalid_data_then_return_400_code(self):
-        invalid_data = {
-            'id': 69,
-            'username': 'moderator',
-            'email': 'moderator',
-            'password': 'terces',
-            'role': 'moderator'
-        }
-
-        rv = self.send_request(data=invalid_data)
-        self.assertEqual(400, rv.status_code)
+    assert 1, "0"

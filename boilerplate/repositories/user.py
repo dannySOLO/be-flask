@@ -102,7 +102,7 @@ def save_user_token_to_database(**kwargs):
     return user_token
 
 
-def update_last_login_to_database(email, **kwargs):
+def update_last_login_to_database(email):
     user = m.User.query.filter_by(email=email).first()
     user.last_login = datetime.datetime.now()
     m.db.session.commit()
@@ -117,13 +117,25 @@ def save_history_password_to_database(**kwargs):
     return password_rec
 
 
-def update_password_to_database(email, new_password, **kwargs):
+def update_password_to_database(email, new_password):
 
     user = m.User.query.filter_by(email=email).first()
     user.password = new_password
     m.db.session.commit()
     return user
 
+
+# ===========
+def save_user_id_to_logging_table(**kwargs):
+    logging_rec = m.Logging(**kwargs)
+    m.db.session.add(logging_rec)
+    m.db.session.commit()
+    return logging
+
+
+# def update_action_to_database(email, action, ** kwargs):
+#     user = m.User.query.filter_by(email=email).first()
+#     user.
 
 # after logging out, set expired_time to timestamp now
 # def update_expired_time_of_token(user_id, token, **kwargs):

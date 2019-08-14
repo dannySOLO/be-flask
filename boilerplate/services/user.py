@@ -6,7 +6,6 @@ import datetime
 import random
 import string
 
-from boilerplate import models as m
 from boilerplate import repositories, models
 
 
@@ -34,13 +33,9 @@ def random_string(string_length=6):
 
 def create_user(email, **kwargs):
     """
-    Validate post data and create a new user
-    :param str username:
-    :param str email:
-    :param str password:
+    :param email:
     :param kwargs:
-    :return: a new user
-    :rtype: m.User
+    :return:
     """
     user_signup_request = repositories.user.find_one_by_email_in_signup_request(email)
 
@@ -52,7 +47,9 @@ def create_user(email, **kwargs):
         **kwargs
     )
     repositories.user.delete_one_by_email_in_signup_request(email)
-    # repositories.user.save_history_password_to_database(user_id=find_user(id), )
+
+    # find_user = repositories.user.find_one_by_email_ignore_case(user.email)
+    # repositories.user.save_user_id_to_logging_table(find_user.id)
     return user
 
 
@@ -84,14 +81,12 @@ def register(username, email, password, confirm_password, **kwargs):
             )
 
         email_confirm_token = serializer.dumps(email, salt='more_salt_please')
-        message = Message('PROJECT - Confirm email for registration', sender='ducanh.danny@gmail.com', recipients=[email])
+        message = Message('PROJECT - Confirm email for registration',
+                          sender='ducanh.danny@gmail.com', recipients=[email])
         link = host_users+'/confirm_email/?token={}'.format(email_confirm_token)
 
         message.body = 'Click the link below to confirm registration in PROJECT: {}'.format(link)
         mail.send(message)
-
-        # [WinError 10061] No connection could be made because the target machine actively refused it
-        # Confirm register email manually instead
 
         repositories.user.save_signup_request_to_database(
             username=username,
@@ -146,6 +141,14 @@ def login(username, password):
 
 
 def change_password(email, old_password, new_password, confirm_password, **kwargs):
+    """
+    :param email:
+    :param old_password:
+    :param new_password:
+    :param confirm_password:
+    :param kwargs:
+    :return:
+    """
     user = repositories.user.find_one_by_email_ignore_case(email=email)
     if not user:
         raise BadRequestException("Account linked to this email does not exist.")
@@ -172,7 +175,13 @@ def change_password(email, old_password, new_password, confirm_password, **kwarg
     return "Password is updated!"
 
 
-def forget_password(username, email, **kwargs):
+def forget_password(username, email):
+    """
+    :param username:
+    :param email:
+    :param kwargs:
+    :return:
+    """
     from boilerplate import mail
 
     if (
@@ -194,7 +203,8 @@ def forget_password(username, email, **kwargs):
             )
         else:
             email_confirm_token = serializer.dumps(email, salt='more_salt_please')
-            message = Message('PROJECT - Confirm email for changing password', sender='ducanh.danny@gmail.com', recipients=[email])
+            message = Message('PROJECT - Confirm email for changing password',
+                              sender='ducanh.danny@gmail.com', recipients=[email])
             link = host_users+'/confirm_email_forget_password/?token={}'.format(email_confirm_token)
 
             message.body = 'Click the link below to confirm changing password: {}'.format(link)
@@ -207,7 +217,7 @@ def forget_password(username, email, **kwargs):
         )
 
 
-def change_password_after_confirm_forgetting_to_database(email, **kwargs):
+def change_password_after_confirm_forgetting_to_database(email):
     random_password = random_string(6)
     repositories.user.update_password_to_database(
         email=email, new_password=random_password

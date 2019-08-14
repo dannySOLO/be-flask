@@ -7,7 +7,7 @@ __author__ = 'Kien'
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="class", autouse=True)
 def app(request):
     from boilerplate import app
     from boilerplate.models import db
@@ -28,3 +28,4 @@ def app(request):
 
     request.addfinalizer(teardown)
     return app
+
